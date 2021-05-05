@@ -70,7 +70,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _startAddNewTransaction(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -120,6 +120,43 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Widget _buildLandscapeContent() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('ShowChart', style: Theme.of(context).textTheme.headline5,),
+        Switch.adaptive(
+            activeColor: Theme.of(context).accentColor,
+            value: _showChart,
+            onChanged: (bool) {
+              setState(() {
+                _showChart = !_showChart;
+              });
+            }),
+      ],
+    );
+  }
+
+  // Widget _buildPortraitContent() {}
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -165,20 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('ShowChart', style: Theme.of(context).textTheme.headline5,),
-                  Switch.adaptive(
-                      activeColor: Theme.of(context).accentColor,
-                      value: _showChart,
-                      onChanged: (bool) {
-                        setState(() {
-                          _showChart = !_showChart;
-                        });
-                      }),
-                ],
-              ),
+              _buildLandscapeContent(),
             if (!isLandscape)
               Container(
                 height: (mediaQuery.size.height -
